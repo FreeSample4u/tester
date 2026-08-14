@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title>Nimbus SSO — Portal Masuk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F172A;
+    --ink-soft:#4B5768;
+    --bg:#EEF2F6;
+    --surface:#FFFFFF;
+    --line:#DCE3EA;
+    --accent-a:#1FCB8E;   /* teal-green */
+    --accent-b:#2E7FFF;   /* blue */
+    --accent-warm:#FFB020;/* amber, focus/links */
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 12px 32px -8px rgba(15,23,42,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+  }
+  a{color:inherit}
+
+  /* ---------- Top bar ---------- */
+  header.topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 32px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:800;font-size:19px;letter-spacing:-0.01em}
+  .brand-mark{
+    width:34px;height:34px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .brand-mark svg{width:18px;height:18px}
+
+  /* ---------- Hero / split ---------- */
+  main{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .stage{
+    width:100%;
+    max-width:1040px;
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:64px;
+    align-items:center;
+  }
+  @media (max-width:860px){
+    .stage{grid-template-columns:1fr}
+    .pitch{display:none}
+  }
+
+  .pitch h1{
+    font-family:'Sora',sans-serif;
+    font-weight:800;
+    font-size:clamp(28px,4vw,40px);
+    line-height:1.15;
+    letter-spacing:-0.02em;
+    margin:0 0 16px;
+  }
+  .pitch p{
+    color:var(--ink-soft);
+    font-size:16px;
+    line-height:1.6;
+    max-width:420px;
+    margin:0 0 28px;
+  }
+
+  /* signature element: chained-node diagram implying "single sign, many apps" */
+  .signature{position:relative;height:120px;max-width:420px}
+  .signature svg{width:100%;height:100%;display:block}
+  .node{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+  .node-active{fill:url(#nodeGrad);stroke:none}
+  .link-line{
+    stroke:var(--line);
+    stroke-width:2;
+    stroke-dasharray:4 5;
+  }
+  .link-line.live{
+    stroke:url(#nodeGrad);
+    stroke-dasharray:none;
+    animation:flow 2.4s linear infinite;
+  }
+  @keyframes flow{
+    0%{stroke-dashoffset:0}
+    100%{stroke-dashoffset:-24}
+  }
+  .node-label{
+    font-family:'Inter',sans-serif;
+    font-size:10.5px;
+    font-weight:600;
+    fill:var(--ink-soft);
+  }
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:32px 30px 26px;
+    width:100%;
+    max-width:400px;
+    margin:0 auto;
+  }
+  .card h2{
+    font-family:'Sora',sans-serif;
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .card .sub{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    margin:0 0 22px;
+  }
+
+  .field{margin-bottom:16px}
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .input-wrap{position:relative}
+  .input{
+    width:100%;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--ink);
+    background:var(--bg);
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    padding:12px 14px;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  .input::placeholder{color:#94A0AF}
+  .input:focus{
+    border-color:var(--accent-b);
+    background:var(--surface);
+    box-shadow:0 0 0 3px rgba(46,127,255,.14);
+  }
+  .toggle-password{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    cursor:pointer;color:#9AA5B2;font-size:12.5px;font-weight:600;
+    user-select:none;
+  }
+  .toggle-password:hover{color:var(--ink-soft)}
+
+  .captcha-row{display:flex;gap:10px;align-items:stretch}
+  .captcha-row .input{flex:1}
+  .captcha-chip{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--bg);
+    border:1.5px dashed var(--line);
+    border-radius:9px;
+    padding:0 14px;
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:.06em;
+    color:var(--ink);
+    min-width:104px;
+    white-space:nowrap;
+  }
+  .captcha-refresh{
+    background:none;border:none;cursor:pointer;color:var(--ink-soft);
+    font-size:15px;line-height:1;padding:0;
+  }
+  .captcha-refresh:hover{color:var(--accent-b)}
+
+  .row-between{display:flex;align-items:center;justify-content:space-between;margin:4px 0 20px}
+  .remember{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-soft)}
+  .remember input{accent-color:var(--accent-b)}
+  .forgot{font-size:13px;font-weight:600;color:var(--accent-b);text-decoration:none}
+  .forgot:hover{text-decoration:underline}
+
+  .btn{
+    width:100%;
+    border:none;border-radius:9px;
+    padding:13px 16px;
+    font-family:'Sora',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer;
+    background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
+    transition:filter .15s, transform .05s;
+  }
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:translateY(1px)}
+
+  .formnote{
+    margin-top:14px;
+    font-size:12px;
+    text-align:center;
+    color:#9AA5B2;
+  }
+  .status{
+    margin-top:14px;
+    font-size:13px;
+    text-align:center;
+    padding:9px 10px;
+    border-radius:8px;
+    display:none;
+  }
+  .status.ok{display:block;background:#E7F9F1;color:#0E7A55}
+  .status.err{display:block;background:#FDECEC;color:#C0392B}
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align:center;
+    padding:20px 12px 26px;
+    font-size:12px;
+    color:#9AA5B2;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="3" fill="white"/><circle cx="18" cy="6" r="3" fill="white" opacity=".85"/><circle cx="18" cy="18" r="3" fill="white" opacity=".85"/><path d="M8.6 10.7 15.4 7.3M8.6 13.3 15.4 16.7" stroke="white" stroke-width="1.4"/></svg>
+    </span>
+    Nimbus&nbsp;SSO
+  </div>
+</header>
+
+<main>
+  <div class="stage">
+
+    <div class="pitch">
+      <h1>Satu akun, semua<br>aplikasi terhubung.</h1>
+      <p>Nimbus SSO menyimpan satu identitas untuk masuk ke seluruh aplikasi
+        yang sudah Anda pakai — tanpa harus mengingat kata sandi berbeda
+        untuk tiap layanan.</p>
+
+      <div class="signature">
+        <svg viewBox="0 0 400 120" fill="none">
+          <defs>
+            <linearGradient id="nodeGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1FCB8E"/>
+              <stop offset="1" stop-color="#2E7FFF"/>
+            </linearGradient>
+          </defs>
+          <line x1="60" y1="60" x2="200" y2="24" class="link-line live"/>
+          <line x1="60" y1="60" x2="200" y2="60" class="link-line live"/>
+          <line x1="60" y1="60" x2="200" y2="96" class="link-line live"/>
+
+          <circle cx="60" cy="60" r="22" class="node-active"/>
+          <text x="60" y="64" text-anchor="middle" font-family="Sora" font-weight="700" font-size="11" fill="#fff">ID</text>
+
+          <circle cx="200" cy="24" r="15" class="node"/>
+          <circle cx="200" cy="60" r="15" class="node"/>
+          <circle cx="200" cy="96" r="15" class="node"/>
+
+          <text x="228" y="28" class="node-label">Mail</text>
+          <text x="228" y="64" class="node-label">Payroll</text>
+          <text x="228" y="100" class="node-label">Docs</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Masuk ke akun Anda</h2>
+      <p class="sub">Gunakan kredensial Nimbus ID Anda.</p>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="field">
+          <label for="username">Nama pengguna</label>
+          <input class="input" type="text" id="username" name="username" placeholder="nama.pengguna" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Kata sandi</label>
+          <div class="input-wrap">
+            <input class="input" type="password" id="password" name="password" placeholder="••••••••" required style="padding-right:64px">
+            <span class="toggle-password" id="togglePassword">Lihat</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="captcha">Kode keamanan</label>
+          <div class="captcha-row">
+            <input class="input" type="text" id="captcha" name="captcha" placeholder="Jawaban" inputmode="numeric" required>
+            <div class="captcha-chip">
+              <span id="captchaQuestion">4 + 3</span>
+              <button type="button" class="captcha-refresh" id="refreshCaptcha" title="Ganti soal">↻</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="remember"><input type="checkbox" name="remember"> Ingat saya</label>
+          <a class="forgot" href="#">Lupa sandi?</a>
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn">Masuk</button>
+
+        <div class="status" id="status"></div>
+        <p class="formnote">Demo — coba <strong>demo</strong> / <strong>Demo#1234</strong></p>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  © 2026 Nimbus SSO — Template desain, bukan produk resmi.
+</footer>
+
+<script>
+  // password show/hide
+  const toggle = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  toggle.addEventListener('click', () => {
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+    toggle.textContent = isHidden ? 'Sembunyikan' : 'Lihat';
+  });
+
+  // simple client-side math captcha (demo only, not secure)
+  let captchaAnswer = 0;
+  function newCaptcha(){
+    const a = Math.floor(Math.random()*9)+1;
+    const b = Math.floor(Math.random()*9)+1;
+    captchaAnswer = a + b;
+    document.getElementById('captchaQuestion').textContent = a + ' + ' + b;
+    document.getElementById('captcha').value = '';
+  }
+  document.getElementById('refreshCaptcha').addEventListener('click', newCaptcha);
+  newCaptcha();
+
+  // real submit handler — sends credentials to the local Node backend
+  const form = document.getElementById('loginForm');
+  const status = document.getElementById('status');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const entered = parseInt(document.getElementById('captcha').value, 10);
+    if (entered !== captchaAnswer) {
+      status.textContent = 'Kode keamanan salah, coba lagi.';
+      status.className = 'status err';
+      newCaptcha();
+      return;
+    }
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Memeriksa…';
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        status.textContent = 'Berhasil masuk. Mengalihkan…';
+        status.className = 'status ok';
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 500);
+      } else {
+        status.textContent = data.error || 'Login gagal.';
+        status.className = 'status err';
+        newCaptcha();
+      }
+    } catch (err) {
+      status.textContent = 'Tidak bisa menghubungi server. Pastikan server Node berjalan.';
+      status.className = 'status err';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Masuk';
+    }
+  });
+</script>
+
+</body>
+</html>

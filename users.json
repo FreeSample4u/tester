@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "username": "demo",
+      "displayName": "Demo User",
+      "salt": "ddaf21a76230b9102fc7eb7af31a0aec",
+      "hash": "147e72941917f4fcfe63365b227985b12537f5a3e5bd6658ea65dc5c23eb83720e8b94129f5c1bf4d0b0a9601a91f6489db745d1f20c362bedd070a11d9d386f"
+    }
+  ]
+}
